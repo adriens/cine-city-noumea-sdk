@@ -42,7 +42,7 @@ public class FilmsWrapper {
         return webClient;
     }
 
-    public static final ArrayList<Film> getFilmsDuJour() throws IOException {
+    public ArrayList<Film> getFilmsDuJour() throws IOException {
         ArrayList<Film> out = new ArrayList<>();
 
         WebClient webClient = buildWebClient();
@@ -81,7 +81,7 @@ public class FilmsWrapper {
         return out;
     }
 
-    public static final ArrayList<Film> getTop20() throws IOException {
+    public ArrayList<Film> getTop20() throws IOException {
         ArrayList<Film> out = new ArrayList<>();
 
         WebClient webClient = buildWebClient();
@@ -112,7 +112,7 @@ public class FilmsWrapper {
         return out;
     }
 
-    public static final ArrayList<Film> getWorst20() throws IOException {
+    public ArrayList<Film> getWorst20() throws IOException {
         ArrayList<Film> out = new ArrayList<>();
 
         WebClient webClient = buildWebClient();
@@ -146,7 +146,8 @@ public class FilmsWrapper {
 
     public static void main(String[] args) {
         try {
-            ArrayList<Film> listeFilmsDuJour = FilmsWrapper.getFilmsDuJour();
+            FilmsWrapper wrapper = new FilmsWrapper();
+            ArrayList<Film> listeFilmsDuJour = wrapper.getFilmsDuJour();
             int filmIndex = 0;
             for (Film aFilm : listeFilmsDuJour) {
                 filmIndex++;
