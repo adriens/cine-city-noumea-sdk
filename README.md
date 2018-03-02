@@ -14,5 +14,19 @@ mvn exec:java
 Exemple de code :
 
 ```java
-
+public static void main(String[] args) {
+        try {
+            FilmsWrapper wrapper = new FilmsWrapper();
+            ArrayList<Film> listeFilmsDuJour = wrapper.getFilmsDuJour();
+            int filmIndex = 0;
+            for (Film aFilm : listeFilmsDuJour) {
+                filmIndex++;
+                System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
+            }
+            System.exit(0);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+    }
  ```
