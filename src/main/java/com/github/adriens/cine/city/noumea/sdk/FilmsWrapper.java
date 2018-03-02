@@ -27,6 +27,12 @@ public class FilmsWrapper {
     public static final String URL_ACCUEIL = "http://www.cinecity.nc/Home/Accueil/";
     public static final String URL_CLASSEMENTS = "http://www.cinecity.nc/Cinecity/Classements";
 
+    public static final String INFO_ADRESSE_PHYSIQUE = "18 Rue de la Somme, Nouméa, New Caledonia";
+    public static final String INFO_URL_GOOGLE_MAPS = "https://goo.gl/maps/UBuJxg13raT2";
+    public static final String INFO_TELEPHONE = "+687 29.20.20";
+    public static final String INFO_URL_WEBSITE = "http://www.cinecity.nc";
+    public static final String INFO_URL_FACEBOOK = "https://www.facebook.com/pages/Cin%C3%A9-City-NC/1955636754710969";
+    
     final static Logger logger = LoggerFactory.getLogger(FilmsWrapper.class);
 
     private static WebClient buildWebClient() {
