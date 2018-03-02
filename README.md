@@ -5,13 +5,13 @@ SDK java pour interagir avec le site du CineCity (Nouméa, NC)
 
 # Usage
 
-Pour compiler et lancer la classe main de demo :
+Pour compiler et lancer la classe main de demo  (joué à la fin du build Travis) :
 
 ```
 mvn exec:java
 ```
 
-Exemple de code :
+Exemple de code (joué à la fin du build Travis également) :
 
 ```java
 public static void main(String[] args) {
