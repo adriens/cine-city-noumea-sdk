@@ -2,3 +2,11 @@
 
 # cine-city-noumea-sdk
 SDK java pour interagir avec le site du CineCity (Nouméa, NC)
+
+# Usage
+
+Pour compiler et lancer la classe main de demo :
+
+```
+mvn exec:java
+```
