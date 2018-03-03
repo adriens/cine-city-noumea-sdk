@@ -25,7 +25,7 @@ public class FilmsWrapper {
 
     public static final String URL_ROOT = "http://www.cinecity.nc/";
     public static final String URL_ACCUEIL = "http://www.cinecity.nc/Home/Accueil/";
-    public static final String URL_CLASSEMENTS = "http://www.cinecity.nc/Cinecity/Classements";
+    public static final String URL_CLASSEMENTS = "http://www.cinecity.nc/Cinecity/Classements/";
 
     public static final String INFO_ADRESSE_PHYSIQUE = "18 Rue de la Somme, Nouméa, New Caledonia";
     public static final String INFO_URL_GOOGLE_MAPS = "https://goo.gl/maps/UBuJxg13raT2";

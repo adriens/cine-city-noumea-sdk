@@ -5,6 +5,8 @@
  */
 package com.github.adriens.cine.city.noumea.sdk;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URL;
 
 /**
@@ -28,13 +30,24 @@ public class Film {
     }
     
     public String toString(){
-        if(getName() == null){
+        
+            ObjectMapper mapper = new ObjectMapper();
+            try{
+                return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+            }
+            catch(JsonProcessingException ex){
+                return ("{\"Film\": \"" + getName() + "\"}" );
+            }
+            
+        }
+        
+        /*if(getName() == null){
             return "";
         }
         else{
             return getName();
-        }
-    }
+        }*/
+    
     public URL getCinecityFilmURL() {
         return cinecityFilmURL;
     }
@@ -57,7 +70,12 @@ public class Film {
      * @param name the name to set
      */
     public void setName(String name) {
-        this.name = name;
+        if(name != null){
+           this.name = name;
+        }
+        else{
+            this.name = "";
+        }
     }
 
     /**
