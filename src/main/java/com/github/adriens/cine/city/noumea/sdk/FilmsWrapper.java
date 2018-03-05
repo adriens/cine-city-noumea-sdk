@@ -14,6 +14,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,45 +149,113 @@ public class FilmsWrapper {
         }
         return out;
     }
-
-    public void setFilmDetails(int filmId) throws IOException {
+    
+    public static final String parseRawDetails(String rawDetails){
+    String out;
+    out = rawDetails;
+    logger.info("rawdetails : <" + out + ">");
+    out = out.replace("Voir la bande-annonce", "").trim();
+    out = out.substring(0, out.length()-1);
+    out = out.trim();
+    
+    logger.info("rawdetails : <" + out + ">");
+    
+    // Guerre - USA - 2018 - 131 mn - Tous publics
+    return out;
+}
+    
+    public static final int parseDuree(String dureeText){
+        int out;
+        String tmp = dureeText;
+        tmp = tmp.replace("mn", "");
+        tmp = StringUtils.strip(tmp);
+        out = Integer.parseInt(tmp);
+        return out;
+    }
+    
+    /**
+     * Position :
+     * 0 : Genre
+     * 1 : Pays
+     * 2 : Année
+     * 3 : durée au format "x mn"
+     * 4 : public
+     */
+    public static final ArrayList<String> getRawDetails(String rawDetails){
+        ArrayList<String> out = new ArrayList<>();
+        String cleanRaw = FilmsWrapper.parseRawDetails(rawDetails);
+        // tolenize
+        StringTokenizer st = new StringTokenizer(cleanRaw, "-");
+        String item;
+        while (st.hasMoreElements()) {
+		item = StringUtils.strip(st.nextElement().toString());
+                logger.info("Detecte : <" + item + ">");
+                out.add(item);
+	}
+        return out;
+    }
+    
+    
+    
+    public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
         WebClient webClient = buildWebClient();
         HtmlPage htmlPage = webClient.getPage(FilmsWrapper.getFilmURL(filmId));
+        FilmDetails out = new FilmDetails();
         
+        out.setFilmId(filmId);
+        
+        logger.info("Récuperation des details du film <" + filmId + ">");
         // le titre
         String titre = ((HtmlElement)htmlPage.getElementById("fiche_titre")).getTextContent().trim();
         logger.info("Film details pour <" + filmId + ">");
         logger.info("Nom du film : <" + titre + ">");
+        out.setTitre(titre);
         
         // url de l'affiche
         String afficheURL = ((HtmlElement)htmlPage.getElementById("fiche_affiche")).getElementsByTagName("img").get(0).getAttribute("src");
         logger.info("detected url : <" + afficheURL + ">");
         afficheURL = URL_ROOT + afficheURL;
-        logger.info("url co;complète : <" + afficheURL + ">");
-        
+        logger.info("url complète : <" + afficheURL + ">");
+        out.setAfficheURL(new URL(afficheURL));
         // realisateur
         String realisateur = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(0).getTextContent();
         logger.info("realisateur : <" + realisateur + ">");
+        out.setRealisateur(realisateur);
         
         //acteurs
         String acteurs = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(1).getTextContent();
         logger.info("acteurs : <" + acteurs + ">");
+        out.setActeurs(acteurs);
+           
+        // note
+        String note = ((HtmlElement)htmlPage.getElementById("fiche_vote")).getElementsByTagName("span").get(0).getElementsByTagName("b").get(0).getTextContent();
+        logger.info("note : <" + note + ">");
+        out.setNote(Integer.parseInt(note));
+        
+        // synopsys
+        String synopsys;
+        synopsys = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
+        logger.info("Synopsys : <" + synopsys + ">");
+        out.setSynopsys(synopsys);
         
         // details (Genre - Pays - Année - durée en minutes - Type de public -)
         // exemple : Guerre - USA - 2018 - 131 mn - Tous publics
         // rawDetails
-        String rawDetails = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("h1").get(0).getTextContent();
+        String rawDetails = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("h1").get(0).getTextContent().trim();
         logger.info("rawDetails : <" + rawDetails + ">");
-                
-        // note
-        String note = ((HtmlElement)htmlPage.getElementById("fiche_vote")).getElementsByTagName("span").get(0).getElementsByTagName("b").get(0).getTextContent();
-        logger.info("note : <" + note + ">");
+        String test = FilmsWrapper.parseRawDetails(rawDetails);
+        //FilmsWrapper.getRawDetails(rawDetails);
+        ArrayList<String> detailsList = FilmsWrapper.getRawDetails(rawDetails);
+        out.setGenre(detailsList.get(0));
+        out.setPays(detailsList.get(1));
+        out.setAnnee(Integer.parseInt(detailsList.get(2)));
+        String duree = detailsList.get(3);
+        out.setDureeMinutes(FilmsWrapper.parseDuree(duree));
         
-        // synopsus
-        String synopsys;
-        synopsys = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
-        logger.info("Synopsys : <" + synopsys + ">");
+        String publicCible = detailsList.get(4);
+        out.setPublicCible(publicCible);
         
+        return out;
     }
     public static void main(String[] args) {
         try {
@@ -197,7 +267,7 @@ public class FilmsWrapper {
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
             */
-            wrapper.setFilmDetails(50225);
+            wrapper.getDetailsOfFilm(50225);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
