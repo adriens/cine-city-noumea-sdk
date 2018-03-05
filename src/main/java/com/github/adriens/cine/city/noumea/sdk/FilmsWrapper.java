@@ -42,6 +42,10 @@ public class FilmsWrapper {
         return webClient;
     }
 
+    public static final String getFilmURL(int filmId){
+        //http://www.cinecity.nc/Cinecity/Film/50225
+        return URL_ROOT + "Cinecity/Film/" + filmId;
+    }
     public ArrayList<Film> getFilmsDuJour() throws IOException {
         ArrayList<Film> out = new ArrayList<>();
 
@@ -144,15 +148,56 @@ public class FilmsWrapper {
         return out;
     }
 
+    public void setFilmDetails(int filmId) throws IOException {
+        WebClient webClient = buildWebClient();
+        HtmlPage htmlPage = webClient.getPage(FilmsWrapper.getFilmURL(filmId));
+        
+        // le titre
+        String titre = ((HtmlElement)htmlPage.getElementById("fiche_titre")).getTextContent().trim();
+        logger.info("Film details pour <" + filmId + ">");
+        logger.info("Nom du film : <" + titre + ">");
+        
+        // url de l'affiche
+        String afficheURL = ((HtmlElement)htmlPage.getElementById("fiche_affiche")).getElementsByTagName("img").get(0).getAttribute("src");
+        logger.info("detected url : <" + afficheURL + ">");
+        afficheURL = URL_ROOT + afficheURL;
+        logger.info("url co;complète : <" + afficheURL + ">");
+        
+        // realisateur
+        String realisateur = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(0).getTextContent();
+        logger.info("realisateur : <" + realisateur + ">");
+        
+        //acteurs
+        String acteurs = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(1).getTextContent();
+        logger.info("acteurs : <" + acteurs + ">");
+        
+        // details (Genre - Pays - Année - durée en minutes - Type de public -)
+        // exemple : Guerre - USA - 2018 - 131 mn - Tous publics
+        // rawDetails
+        String rawDetails = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("h1").get(0).getTextContent();
+        logger.info("rawDetails : <" + rawDetails + ">");
+                
+        // note
+        String note = ((HtmlElement)htmlPage.getElementById("fiche_vote")).getElementsByTagName("span").get(0).getElementsByTagName("b").get(0).getTextContent();
+        logger.info("note : <" + note + ">");
+        
+        // synopsus
+        String synopsys;
+        synopsys = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
+        logger.info("Synopsys : <" + synopsys + ">");
+        
+    }
     public static void main(String[] args) {
         try {
             FilmsWrapper wrapper = new FilmsWrapper();
-            ArrayList<Film> listeFilmsDuJour = wrapper.getFilmsDuJour();
+            /*ArrayList<Film> listeFilmsDuJour = wrapper.getFilmsDuJour();
             int filmIndex = 0;
             for (Film aFilm : listeFilmsDuJour) {
                 filmIndex++;
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
+            */
+            wrapper.setFilmDetails(50225);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
