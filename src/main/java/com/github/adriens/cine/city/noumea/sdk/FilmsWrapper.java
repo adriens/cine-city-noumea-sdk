@@ -92,34 +92,7 @@ public class FilmsWrapper {
     }
 
     public ArrayList<Film> getTop20() throws IOException {
-        ArrayList<Film> out = new ArrayList<>();
-
-        WebClient webClient = buildWebClient();
-        HtmlPage htmlPage = webClient.getPage(URL_CLASSEMENTS);
-
-        logger.info("Liste des 20 meilleurs films sur Cinecity :");
-
-        DomElement domFilms = htmlPage.getElementById("col_gauche_coul");
-        DomNodeList<HtmlElement> filmsList = domFilms.getElementsByTagName("a");
-        logger.info("Nb top 20 films : <" + filmsList.size() + ">");
-        String filmURL;
-        String filmTitle;
-
-        for (HtmlElement film : filmsList) {
-            Film aFilm = new Film();
-
-            // fiilm url
-            filmURL = URL_ROOT + film.getAttribute("href");
-            System.out.println(filmURL);
-            aFilm.setCinecityFilmURL(new URL(filmURL));
-
-            //film name
-            filmTitle = film.getAttribute("title");
-            System.out.println(filmTitle);
-            aFilm.setName(filmTitle);
-            out.add(aFilm);
-        }
-        return out;
+        return getTop(FilmRankingCategory.BEST, 20);
     }
     
     public ArrayList<Film> getTop(FilmRankingCategory rankingCategoty, int nbFilms) throws IOException {
@@ -178,36 +151,8 @@ public class FilmsWrapper {
         return out;
     }
 
-    public ArrayList<Film> getWorst20() throws IOException {
-        ArrayList<Film> out = new ArrayList<>();
-
-        WebClient webClient = buildWebClient();
-        HtmlPage htmlPage = webClient.getPage(URL_CLASSEMENTS);
-
-        DomElement domFilms = htmlPage.getElementById("col_droite_coul");
-        DomNodeList<HtmlElement> filmsList = domFilms.getElementsByTagName("a");
-        //logger.info("Film name : " + aFilm.getName());
-        logger.info("Nb top 20 films : <" + filmsList.size() + ">");
-        String filmURL;
-        String filmTitle;
-        logger.info("Liste des pires 20 films sur Cinecity :");
-
-        for (HtmlElement film : filmsList) {
-            Film aFilm = new Film();
-
-            // fiilm url
-            filmURL = URL_ROOT + film.getAttribute("href");
-
-            aFilm.setCinecityFilmURL(new URL(filmURL));
-            logger.info(aFilm.getCinecityFilmURL().toString());
-            //film name
-            filmTitle = film.getAttribute("title");
-            //System.out.println(filmTitle);
-            aFilm.setName(filmTitle);
-            logger.info("Film : <" + aFilm.getName() + ">");
-            out.add(aFilm);
-        }
-        return out;
+    public ArrayList<Film> getWorsts20() throws IOException {
+        return this.getTop(FilmRankingCategory.WORTS, 20);
     }
     
     public static final String parseRawDetails(String rawDetails){
@@ -328,7 +273,8 @@ public class FilmsWrapper {
             }
             */
             //wrapper.getDetailsOfFilm(50225);
-            wrapper.getTop(FilmRankingCategory.WORTS, 3);
+            //wrapper.getTop(FilmRankingCategory.WORTS, 3);
+            wrapper.getWorsts20();
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
