@@ -37,6 +37,10 @@ public class FilmsWrapper {
     
     final static Logger logger = LoggerFactory.getLogger(FilmsWrapper.class);
 
+    public enum FilmRankingCategory {
+    BEST,
+    WORTS;
+    }
     private static WebClient buildWebClient() {
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setJavaScriptEnabled(false);
@@ -114,6 +118,62 @@ public class FilmsWrapper {
             System.out.println(filmTitle);
             aFilm.setName(filmTitle);
             out.add(aFilm);
+        }
+        return out;
+    }
+    
+    public ArrayList<Film> getTop(FilmRankingCategory rankingCategoty, int nbFilms) throws IOException {
+        int lNbLocalFilm = 20;
+        
+        if(nbFilms > 20){
+            lNbLocalFilm = 20;
+        }
+        else if(nbFilms < 1){
+            lNbLocalFilm = 1;
+        }
+        else {
+            lNbLocalFilm = 20;
+        }
+        
+        ArrayList<Film> out = new ArrayList<>();
+
+        WebClient webClient = buildWebClient();
+        HtmlPage htmlPage = webClient.getPage(URL_CLASSEMENTS);
+
+        logger.info("Top <" + nbFilms+ "> des <"+ rankingCategoty + ">extrait du top 20 des films de ce genre sur Cinecity :");
+
+        //DomElement domFilms;
+        DomElement domFilms;
+        if((rankingCategoty == FilmsWrapper.FilmRankingCategory.BEST) || rankingCategoty == null){
+            // it no rank style provided, five the top ones by default
+            domFilms = htmlPage.getElementById("col_gauche_coul");
+        }
+        else{
+             domFilms = htmlPage.getElementById("col_droite_coul");
+        }
+        
+        DomNodeList<HtmlElement> filmsList = domFilms.getElementsByTagName("a");
+        //logger.info("Nb top 20 films : <" + filmsList.size() + ">");
+        String filmURL;
+        String filmTitle;
+        int filmLoopId=0;
+        for (HtmlElement film : filmsList) {
+            filmLoopId++;
+            Film aFilm = new Film();
+
+            // fiilm url
+            filmURL = URL_ROOT + film.getAttribute("href");
+            System.out.println(filmURL);
+            aFilm.setCinecityFilmURL(new URL(filmURL));
+
+            //film name
+            filmTitle = film.getAttribute("title");
+            System.out.println(filmTitle);
+            aFilm.setName(filmTitle);
+            out.add(aFilm);
+            if(filmLoopId == nbFilms){
+                return out;
+            }
         }
         return out;
     }
@@ -267,7 +327,8 @@ public class FilmsWrapper {
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
             */
-            wrapper.getDetailsOfFilm(50225);
+            //wrapper.getDetailsOfFilm(50225);
+            wrapper.getTop(FilmRankingCategory.WORTS, 3);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
