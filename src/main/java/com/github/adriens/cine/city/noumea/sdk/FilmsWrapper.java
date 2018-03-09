@@ -240,7 +240,10 @@ public class FilmsWrapper {
 
         // synopsys
         String synopsys;
-        synopsys = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
+        DomNodeList<HtmlElement> htmlNodes = htmlPage.getElementById("fiche_texte").getElementsByTagName("p");
+        // le synopsys est toujours le dernier p de la liste
+        //synopsys = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
+        synopsys = htmlNodes.get(htmlNodes.size()-1).getTextContent();
         logger.info("Synopsys : <" + synopsys + ">");
         out.setSynopsys(synopsys);
 
@@ -284,9 +287,11 @@ public class FilmsWrapper {
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
              */
-            //wrapper.getDetailsOfFilm(50225);
-            wrapper.getTop(FilmRankingCategory.BEST, 3);
+            wrapper.getDetailsOfFilm(50225);
+            //wrapper.getTop(FilmRankingCategory.BEST, 3);
             //wrapper.getWorsts20();
+            //wrapper.getDetailsOfFilm(39476);
+            //wrapper.getDetailsOfFilm(39371);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
