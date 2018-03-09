@@ -159,6 +159,8 @@ public class FilmsWrapper {
             aFilm.setCinecityFilmURL(new URL(filmURL));
             logger.debug("Film URL : <" + aFilm.getCinecityFilmURL() + ">");
 
+            //int lFilmId = extractFilmIdFromFilmURL(aFilm.getCinecityFilmURL().toString());
+            //aFilm.setFilmId(lFilmId);
             //film name
             filmTitle = film.getAttribute("title");
             logger.debug("Film title : <" + filmTitle + ">");
@@ -166,8 +168,10 @@ public class FilmsWrapper {
             // pas d'affiche sur cette page
             // on va la récuéprer à partir de son URL cinecity
             int lFilmId = FilmsWrapper.extractFilmIdFromFilmURL(aFilm.getCinecityFilmURL().toString());
-            logger.debug("Film id : <" + lFilmId + ">");
+            
             //logger.info("filmId : <");
+            aFilm.setFilmId(lFilmId);
+            logger.debug("Film id : <" + aFilm.getFilmId() + ">");
             //FilmsWrapper lWrapper = new FilmsWrapper();
             
             // STop getting details it takes to much time at this point on Heroku whic has
