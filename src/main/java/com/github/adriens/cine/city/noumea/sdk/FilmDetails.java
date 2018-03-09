@@ -163,61 +163,7 @@ public class FilmDetails {
         this.genre = genre;
     }
 
-    /**
-     * @return the pays
-     */
-    public String getPays() {
-        return pays;
-    }
-
-    /**
-     * @param pays the pays to set
-     */
-    public void setPays(String pays) {
-        this.pays = pays;
-    }
-
-    /**
-     * @return the annee
-     */
-    public int getAnnee() {
-        return annee;
-    }
-
-    /**
-     * @param annee the annee to set
-     */
-    public void setAnnee(int annee) {
-        this.annee = annee;
-    }
-
-    /**
-     * @return the dureeMinutes
-     */
-    public int getDureeMinutes() {
-        return dureeMinutes;
-    }
-
-    /**
-     * @param dureeMinutes the dureeMinutes to set
-     */
-    public void setDureeMinutes(int dureeMinutes) {
-        this.dureeMinutes = dureeMinutes;
-    }
-
-    /**
-     * @return the publicCible
-     */
-    public String getPublicCible() {
-        return publicCible;
-    }
-
-    /**
-     * @param publicCible the publicCible to set
-     */
-    public void setPublicCible(String publicCible) {
-        this.publicCible = publicCible;
-    }
+  
     private String titre;
     private URL afficheURL;
     private int filmId;
@@ -228,12 +174,6 @@ public class FilmDetails {
     private String synopsys;
     //
     private String genre;
-    private String pays;
-    private int annee;
-    private int dureeMinutes;
-    private String publicCible;
-    
-    //
     private String rawDetails;
     
     

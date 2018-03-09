@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.StringTokenizer; 
 /**
  *
  * @author salad74
@@ -183,27 +183,19 @@ public class FilmsWrapper {
         out = out.replace("Voir la bande-annonce", "").trim();
         out = out.substring(0, out.length() - 1);
         out = out.trim();
-
         logger.info("cleaned rawdetails : <" + out + ">");
-
         // Guerre - USA - 2018 - 131 mn - Tous publics
         return out;
     }
     
-    
-
-    public static final int parseDuree(String dureeText) {
-        int out;
-        String tmp = dureeText;
-        tmp = tmp.replace("mn", "");
-        tmp = StringUtils.strip(tmp);
-        out = Integer.parseInt(tmp);
+    public final static String extractGenreFromRawDetails(String inRawDetails){
+        String out = FilmsWrapper.cleanRawDetails(inRawDetails);
+        StringTokenizer st = new StringTokenizer(out,"-");  
+        out = st.nextToken().trim();
         return out;
     }
-
     
-
-    public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
+  public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
         WebClient webClient = buildWebClient();
         HtmlPage htmlPage = webClient.getPage(FilmsWrapper.getFilmURL(filmId));
         FilmDetails out = new FilmDetails();
@@ -260,8 +252,8 @@ public class FilmsWrapper {
         //ArrayList<String> detailsList = FilmsWrapper.getRawDetailsAsList(rawDetails);
         
         // le genre est TOUJOURS en position 0
-        //out.setGenre(FilmsWrapper.getGenreFromRawDetails(rawDetails));
-        
+        out.setGenre(FilmsWrapper.extractGenreFromRawDetails(rawDetails));
+        logger.info("Set genre to <" + out.getGenre() + ">");
         // Parfois il y a plusieurs pays... ;-(
         //out.setPays(detailsList.get(1));
         
@@ -289,11 +281,11 @@ public class FilmsWrapper {
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
              */
-            wrapper.getDetailsOfFilm(50225);
+            //wrapper.getDetailsOfFilm(50225);
             //wrapper.getTop(FilmRankingCategory.BEST, 3);
             //wrapper.getWorsts20();
             //wrapper.getDetailsOfFilm(39476);
-            //wrapper.getDetailsOfFilm(39371);
+            wrapper.getDetailsOfFilm(39373);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
