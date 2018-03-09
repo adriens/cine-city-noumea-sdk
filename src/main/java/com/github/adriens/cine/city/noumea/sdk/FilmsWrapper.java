@@ -55,6 +55,9 @@ public class FilmsWrapper {
     }
 
     private static WebClient buildWebClient() {
+        // Disable verbose logs
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
+        java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);        
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setJavaScriptEnabled(false);
         webClient.getOptions().setDownloadImages(false);
@@ -160,9 +163,10 @@ public class FilmsWrapper {
             int lFilmId = FilmsWrapper.extractFilmIdFromFilmURL(aFilm.getCinecityFilmURL().toString());
             logger.debug("Film id : <" + lFilmId + ">");
             //logger.info("filmId : <");
-            FilmsWrapper lWrapper = new FilmsWrapper();
-            logger.debug("Affiche URL : <" + lWrapper.getDetailsOfFilm(lFilmId).getAfficheURL() + ">");
-            aFilm.setCinecityAfficheURL(lWrapper.getDetailsOfFilm(lFilmId).getAfficheURL());
+            //FilmsWrapper lWrapper = new FilmsWrapper();
+            URL lAfficheURL = this.getDetailsOfFilm(lFilmId).getAfficheURL();
+            logger.debug("Affiche URL : <" + lAfficheURL + ">");
+            aFilm.setCinecityAfficheURL(lAfficheURL);
             out.add(aFilm);
 
             if (filmLoopId == nbFilms) {
@@ -283,9 +287,9 @@ public class FilmsWrapper {
              */
             //wrapper.getDetailsOfFilm(50225);
             //wrapper.getTop(FilmRankingCategory.BEST, 3);
-            //wrapper.getWorsts20();
+            wrapper.getWorsts20();
             //wrapper.getDetailsOfFilm(39476);
-            wrapper.getDetailsOfFilm(39373);
+            //wrapper.getDetailsOfFilm(39373);
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
