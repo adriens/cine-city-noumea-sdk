@@ -16,6 +16,20 @@ import org.slf4j.LoggerFactory;
  */
 public class FilmDetails {
 
+    /**
+     * @return the rawDetails
+     */
+    public String getRawDetails() {
+        return rawDetails;
+    }
+
+    /**
+     * @param rawDetails the rawDetails to set
+     */
+    public void setRawDetails(String rawDetails) {
+        this.rawDetails = rawDetails;
+    }
+
     final static Logger logger = LoggerFactory.getLogger(FilmDetails.class);
 
     public FilmDetails(){
@@ -212,12 +226,15 @@ public class FilmDetails {
     private String acteurs;
     private int note;
     private String synopsys;
+    //
     private String genre;
     private String pays;
     private int annee;
     private int dureeMinutes;
     private String publicCible;
-            
+    
+    //
+    private String rawDetails;
     
     
 }

@@ -14,7 +14,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,22 +24,36 @@ import org.slf4j.LoggerFactory;
  */
 public class FilmsWrapper {
 
-    public static final String URL_ROOT = "http://www.cinecity.nc/";
-    public static final String URL_ACCUEIL = "http://www.cinecity.nc/Home/Accueil/";
-    public static final String URL_CLASSEMENTS = "http://www.cinecity.nc/Cinecity/Classements/";
-
+    public static final String URL_ROOT = "http://www.cinecity.nc";
+    public static final String URL_ACCUEIL = "http://www.cinecity.nc/Home/Accueil";
+    public static final String URL_CLASSEMENTS = "http://www.cinecity.nc/Cinecity/Classements";
+    public static final String URL_BASE_FILM8 = "http://www.cinecity.nc/Cinecity/Film";
     public static final String INFO_ADRESSE_PHYSIQUE = "18 Rue de la Somme, Nouméa, New Caledonia";
     public static final String INFO_URL_GOOGLE_MAPS = "https://goo.gl/maps/UBuJxg13raT2";
     public static final String INFO_TELEPHONE = "+687 29.20.20";
     public static final String INFO_URL_WEBSITE = "http://www.cinecity.nc";
     public static final String INFO_URL_FACEBOOK = "https://www.facebook.com/pages/Cin%C3%A9-City-NC/1955636754710969";
-    
+
     final static Logger logger = LoggerFactory.getLogger(FilmsWrapper.class);
 
     public enum FilmRankingCategory {
-    BEST,
-    WORTS;
+        BEST,
+        WORST;
     }
+    
+   
+
+    public static final int extractFilmIdFromFilmURL(String filmURL) {
+        int out;
+        String tmp = filmURL;
+
+        // http://www.cinecity.nc/Cinecity/Film/39428
+        logger.info("Input url to extract : <" + filmURL + ">");
+        //tmp = tmp.replace(FilmsWrapper.URL_BASE_FILM8 + "/", "");
+        logger.info("Intermediar transform : <" + tmp + ">");
+        return Integer.parseInt(tmp.replace(FilmsWrapper.URL_BASE_FILM8 + "/", ""));
+    }
+
     private static WebClient buildWebClient() {
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setJavaScriptEnabled(false);
@@ -48,10 +61,11 @@ public class FilmsWrapper {
         return webClient;
     }
 
-    public static final String getFilmURL(int filmId){
+    public static final String getFilmURL(int filmId) {
         //http://www.cinecity.nc/Cinecity/Film/50225
-        return URL_ROOT + "Cinecity/Film/" + filmId;
+        return URL_ROOT + "/Cinecity/Film/" + filmId;
     }
+
     public ArrayList<Film> getFilmsDuJour() throws IOException {
         ArrayList<Film> out = new ArrayList<>();
 
@@ -94,57 +108,64 @@ public class FilmsWrapper {
     public ArrayList<Film> getTop20() throws IOException {
         return getTop(FilmRankingCategory.BEST, 20);
     }
-    
+
     public ArrayList<Film> getTop(FilmRankingCategory rankingCategoty, int nbFilms) throws IOException {
         int lNbLocalFilm = 20;
-        
-        if(nbFilms > 20){
+
+        if (nbFilms > 20) {
             lNbLocalFilm = 20;
-        }
-        else if(nbFilms < 1){
+        } else if (nbFilms < 1) {
             lNbLocalFilm = 1;
-        }
-        else {
+        } else {
             lNbLocalFilm = 20;
         }
-        
+
         ArrayList<Film> out = new ArrayList<>();
 
         WebClient webClient = buildWebClient();
         HtmlPage htmlPage = webClient.getPage(URL_CLASSEMENTS);
 
-        logger.info("Top <" + nbFilms+ "> des <"+ rankingCategoty + ">extrait du top 20 des films de ce genre sur Cinecity :");
+        logger.info("Top <" + nbFilms + "> des <" + rankingCategoty + ">extrait du top 20 des films de ce genre sur Cinecity :");
 
         //DomElement domFilms;
         DomElement domFilms;
-        if((rankingCategoty == FilmsWrapper.FilmRankingCategory.BEST) || rankingCategoty == null){
+        if ((rankingCategoty == FilmsWrapper.FilmRankingCategory.BEST) || rankingCategoty == null) {
             // it no rank style provided, five the top ones by default
             domFilms = htmlPage.getElementById("col_gauche_coul");
+        } else {
+            domFilms = htmlPage.getElementById("col_droite_coul");
         }
-        else{
-             domFilms = htmlPage.getElementById("col_droite_coul");
-        }
-        
+
         DomNodeList<HtmlElement> filmsList = domFilms.getElementsByTagName("a");
         //logger.info("Nb top 20 films : <" + filmsList.size() + ">");
         String filmURL;
         String filmTitle;
-        int filmLoopId=0;
+        int filmLoopId = 0;
         for (HtmlElement film : filmsList) {
             filmLoopId++;
             Film aFilm = new Film();
 
             // fiilm url
             filmURL = URL_ROOT + film.getAttribute("href");
-            System.out.println(filmURL);
+
             aFilm.setCinecityFilmURL(new URL(filmURL));
+            logger.info("Film URL : <" + aFilm.getCinecityFilmURL() + ">");
 
             //film name
             filmTitle = film.getAttribute("title");
-            System.out.println(filmTitle);
+            logger.info("Film title : <" + filmTitle + ">");
             aFilm.setName(filmTitle);
+            // pas d'affiche sur cette page
+            // on va la récuéprer à partir de son URL cinecity
+            int lFilmId = FilmsWrapper.extractFilmIdFromFilmURL(aFilm.getCinecityFilmURL().toString());
+            logger.info("Film id : <" + lFilmId + ">");
+            //logger.info("filmId : <");
+            FilmsWrapper lWrapper = new FilmsWrapper();
+            logger.info("Affiche URL : <" + lWrapper.getDetailsOfFilm(lFilmId).getAfficheURL() + ">");
+            aFilm.setCinecityAfficheURL(lWrapper.getDetailsOfFilm(lFilmId).getAfficheURL());
             out.add(aFilm);
-            if(filmLoopId == nbFilms){
+
+            if (filmLoopId == nbFilms) {
                 return out;
             }
         }
@@ -152,24 +173,26 @@ public class FilmsWrapper {
     }
 
     public ArrayList<Film> getWorsts20() throws IOException {
-        return this.getTop(FilmRankingCategory.WORTS, 20);
+        return this.getTop(FilmRankingCategory.WORST, 20);
+    }
+
+    public static final String cleanRawDetails(String rawDetails) {
+        String out;
+        out = rawDetails;
+        logger.info("rawdetails : <" + out + ">");
+        out = out.replace("Voir la bande-annonce", "").trim();
+        out = out.substring(0, out.length() - 1);
+        out = out.trim();
+
+        logger.info("cleaned rawdetails : <" + out + ">");
+
+        // Guerre - USA - 2018 - 131 mn - Tous publics
+        return out;
     }
     
-    public static final String parseRawDetails(String rawDetails){
-    String out;
-    out = rawDetails;
-    logger.info("rawdetails : <" + out + ">");
-    out = out.replace("Voir la bande-annonce", "").trim();
-    out = out.substring(0, out.length()-1);
-    out = out.trim();
     
-    logger.info("rawdetails : <" + out + ">");
-    
-    // Guerre - USA - 2018 - 131 mn - Tous publics
-    return out;
-}
-    
-    public static final int parseDuree(String dureeText){
+
+    public static final int parseDuree(String dureeText) {
         int out;
         String tmp = dureeText;
         tmp = tmp.replace("mn", "");
@@ -177,91 +200,80 @@ public class FilmsWrapper {
         out = Integer.parseInt(tmp);
         return out;
     }
+
     
-    /**
-     * Position :
-     * 0 : Genre
-     * 1 : Pays
-     * 2 : Année
-     * 3 : durée au format "x mn"
-     * 4 : public
-     */
-    public static final ArrayList<String> getRawDetails(String rawDetails){
-        ArrayList<String> out = new ArrayList<>();
-        String cleanRaw = FilmsWrapper.parseRawDetails(rawDetails);
-        // tolenize
-        StringTokenizer st = new StringTokenizer(cleanRaw, "-");
-        String item;
-        while (st.hasMoreElements()) {
-		item = StringUtils.strip(st.nextElement().toString());
-                logger.info("Detecte : <" + item + ">");
-                out.add(item);
-	}
-        return out;
-    }
-    
-    
-    
+
     public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
         WebClient webClient = buildWebClient();
         HtmlPage htmlPage = webClient.getPage(FilmsWrapper.getFilmURL(filmId));
         FilmDetails out = new FilmDetails();
-        
+
         out.setFilmId(filmId);
-        
+
         logger.info("Récuperation des details du film <" + filmId + ">");
         // le titre
-        String titre = ((HtmlElement)htmlPage.getElementById("fiche_titre")).getTextContent().trim();
+        String titre = ((HtmlElement) htmlPage.getElementById("fiche_titre")).getTextContent().trim();
         logger.info("Film details pour <" + filmId + ">");
         logger.info("Nom du film : <" + titre + ">");
         out.setTitre(titre);
-        
+
         // url de l'affiche
-        String afficheURL = ((HtmlElement)htmlPage.getElementById("fiche_affiche")).getElementsByTagName("img").get(0).getAttribute("src");
+        String afficheURL = ((HtmlElement) htmlPage.getElementById("fiche_affiche")).getElementsByTagName("img").get(0).getAttribute("src");
         logger.info("detected url : <" + afficheURL + ">");
         afficheURL = URL_ROOT + afficheURL;
         logger.info("url complète : <" + afficheURL + ">");
         out.setAfficheURL(new URL(afficheURL));
         // realisateur
-        String realisateur = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(0).getTextContent();
+        String realisateur = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(0).getTextContent();
         logger.info("realisateur : <" + realisateur + ">");
         out.setRealisateur(realisateur);
-        
+
         //acteurs
-        String acteurs = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(1).getTextContent();
+        String acteurs = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(1).getTextContent();
         logger.info("acteurs : <" + acteurs + ">");
         out.setActeurs(acteurs);
-           
+
         // note
-        String note = ((HtmlElement)htmlPage.getElementById("fiche_vote")).getElementsByTagName("span").get(0).getElementsByTagName("b").get(0).getTextContent();
+        String note = ((HtmlElement) htmlPage.getElementById("fiche_vote")).getElementsByTagName("span").get(0).getElementsByTagName("b").get(0).getTextContent();
         logger.info("note : <" + note + ">");
         out.setNote(Integer.parseInt(note));
-        
+
         // synopsys
         String synopsys;
-        synopsys = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
+        synopsys = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
         logger.info("Synopsys : <" + synopsys + ">");
         out.setSynopsys(synopsys);
-        
+
         // details (Genre - Pays - Année - durée en minutes - Type de public -)
         // exemple : Guerre - USA - 2018 - 131 mn - Tous publics
         // rawDetails
-        String rawDetails = ((HtmlElement)htmlPage.getElementById("fiche_texte")).getElementsByTagName("h1").get(0).getTextContent().trim();
+        String rawDetails = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("h1").get(0).getTextContent().trim();
         logger.info("rawDetails : <" + rawDetails + ">");
-        String test = FilmsWrapper.parseRawDetails(rawDetails);
+        out.setRawDetails(FilmsWrapper.cleanRawDetails(rawDetails));
+        //String test = FilmsWrapper.cleanRawDetails(rawDetails);
         //FilmsWrapper.getRawDetails(rawDetails);
-        ArrayList<String> detailsList = FilmsWrapper.getRawDetails(rawDetails);
-        out.setGenre(detailsList.get(0));
-        out.setPays(detailsList.get(1));
-        out.setAnnee(Integer.parseInt(detailsList.get(2)));
-        String duree = detailsList.get(3);
-        out.setDureeMinutes(FilmsWrapper.parseDuree(duree));
+        //ArrayList<String> detailsList = FilmsWrapper.getRawDetailsAsList(rawDetails);
         
-        String publicCible = detailsList.get(4);
-        out.setPublicCible(publicCible);
+        // le genre est TOUJOURS en position 0
+        //out.setGenre(FilmsWrapper.getGenreFromRawDetails(rawDetails));
         
+        // Parfois il y a plusieurs pays... ;-(
+        //out.setPays(detailsList.get(1));
+        
+        
+        //out.setAnnee(Integer.parseInt(detailsList.get(detailsList.size() - 3)));
+        
+        // durée en avant dernière position
+        //String duree = detailsList.get(detailsList.size() - 2);
+        //logger.info("Duree extraite : <" + duree + ">");
+        //out.setDureeMinutes(FilmsWrapper.parseDuree(duree));
+
+        //String publicCible = detailsList.get(detailsList.size() - 1);
+        //out.setPublicCible(publicCible);
+
         return out;
     }
+
     public static void main(String[] args) {
         try {
             FilmsWrapper wrapper = new FilmsWrapper();
@@ -271,10 +283,10 @@ public class FilmsWrapper {
                 filmIndex++;
                 System.out.println("Film <" + filmIndex + "> trouvé : <" + aFilm + ">");
             }
-            */
+             */
             //wrapper.getDetailsOfFilm(50225);
-            //wrapper.getTop(FilmRankingCategory.WORTS, 3);
-            wrapper.getWorsts20();
+            wrapper.getTop(FilmRankingCategory.BEST, 3);
+            //wrapper.getWorsts20();
             System.exit(0);
         } catch (IOException ex) {
             ex.printStackTrace();
