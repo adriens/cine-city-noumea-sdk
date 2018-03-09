@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.StringTokenizer; 
+import java.util.StringTokenizer;
+
 /**
  *
  * @author salad74
@@ -40,8 +41,12 @@ public class FilmsWrapper {
         BEST,
         WORST;
     }
-    
-   
+
+    public FilmsWrapper() {
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
+        java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);
+
+    }
 
     public static final int extractFilmIdFromFilmURL(String filmURL) {
         int out;
@@ -57,7 +62,7 @@ public class FilmsWrapper {
     private static WebClient buildWebClient() {
         // Disable verbose logs
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
-        java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);        
+        java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setJavaScriptEnabled(false);
         webClient.getOptions().setDownloadImages(false);
@@ -191,15 +196,15 @@ public class FilmsWrapper {
         // Guerre - USA - 2018 - 131 mn - Tous publics
         return out;
     }
-    
-    public final static String extractGenreFromRawDetails(String inRawDetails){
+
+    public final static String extractGenreFromRawDetails(String inRawDetails) {
         String out = FilmsWrapper.cleanRawDetails(inRawDetails);
-        StringTokenizer st = new StringTokenizer(out,"-");  
+        StringTokenizer st = new StringTokenizer(out, "-");
         out = st.nextToken().trim();
         return out;
     }
-    
-  public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
+
+    public FilmDetails getDetailsOfFilm(int filmId) throws IOException {
         WebClient webClient = buildWebClient();
         HtmlPage htmlPage = webClient.getPage(FilmsWrapper.getFilmURL(filmId));
         FilmDetails out = new FilmDetails();
@@ -241,7 +246,7 @@ public class FilmsWrapper {
         DomNodeList<HtmlElement> htmlNodes = htmlPage.getElementById("fiche_texte").getElementsByTagName("p");
         // le synopsys est toujours le dernier p de la liste
         //synopsys = ((HtmlElement) htmlPage.getElementById("fiche_texte")).getElementsByTagName("p").get(2).getTextContent();
-        synopsys = htmlNodes.get(htmlNodes.size()-1).getTextContent();
+        synopsys = htmlNodes.get(htmlNodes.size() - 1).getTextContent();
         logger.debug("Synopsys : <" + synopsys + ">");
         out.setSynopsys(synopsys);
 
@@ -254,24 +259,20 @@ public class FilmsWrapper {
         //String test = FilmsWrapper.cleanRawDetails(rawDetails);
         //FilmsWrapper.getRawDetails(rawDetails);
         //ArrayList<String> detailsList = FilmsWrapper.getRawDetailsAsList(rawDetails);
-        
+
         // le genre est TOUJOURS en position 0
         out.setGenre(FilmsWrapper.extractGenreFromRawDetails(rawDetails));
         logger.debug("Set genre to <" + out.getGenre() + ">");
         // Parfois il y a plusieurs pays... ;-(
         //out.setPays(detailsList.get(1));
-        
-        
+
         //out.setAnnee(Integer.parseInt(detailsList.get(detailsList.size() - 3)));
-        
         // durée en avant dernière position
         //String duree = detailsList.get(detailsList.size() - 2);
         //logger.info("Duree extraite : <" + duree + ">");
         //out.setDureeMinutes(FilmsWrapper.parseDuree(duree));
-
         //String publicCible = detailsList.get(detailsList.size() - 1);
         //out.setPublicCible(publicCible);
-
         return out;
     }
 
