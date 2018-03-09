@@ -89,16 +89,19 @@ public class FilmsWrapper {
         for (HtmlElement film : filmsList) {
             nbFilms++;
             Film aFilm = new Film();
-            logger.info("#####################################");
-            logger.info("Film <" + nbFilms + ">");
+            logger.debug("#####################################");
+            logger.debug("Film <" + nbFilms + ">");
             logger.debug(film.asXml());
 
             // cineCity URL
             DomNodeList urls = film.getElementsByTagName("a");
             HtmlElement localUri = (HtmlElement) urls.get(0);
             logger.debug("Cinecity local URL : " + URL_ROOT + localUri.getAttribute("href"));
-            aFilm.setCinecityFilmURL(new URL(URL_ROOT + localUri.getAttribute("href")));
+            URL lCineCityUrl = new URL(URL_ROOT + localUri.getAttribute("href"));
+            aFilm.setCinecityFilmURL(lCineCityUrl);
 
+            int lFilmId = extractFilmIdFromFilmURL(lCineCityUrl.toString());
+            aFilm.setFilmId(lFilmId);
             //filmName
             HtmlElement filmName = (HtmlElement) urls.get(1);
             aFilm.setName(filmName.getTextContent());
