@@ -16,6 +16,20 @@ import java.net.URL;
 public class Film {
 
     /**
+     * @return the filmId
+     */
+    public int getFilmId() {
+        return filmId;
+    }
+
+    /**
+     * @param filmId the filmId to set
+     */
+    public void setFilmId(int filmId) {
+        this.filmId = filmId;
+    }
+
+    /**
      * @return the cinecityFilmURL
      */
     public Film(){
@@ -94,4 +108,5 @@ public class Film {
     private URL cinecityFilmURL;
     private String name;
     private URL cinecityAfficheURL;
+    private int filmId;
 }
