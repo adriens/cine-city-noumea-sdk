@@ -114,10 +114,10 @@ public class FilmsWrapper {
     }
 
     public ArrayList<Film> getTop20() throws IOException {
-        return getTop(FilmRankingCategory.BEST, 20);
+        return getTop(FilmRankingCategory.BEST, 20, false);
     }
 
-    public ArrayList<Film> getTop(FilmRankingCategory rankingCategoty, int nbFilms) throws IOException {
+    public ArrayList<Film> getTop(FilmRankingCategory rankingCategoty, int nbFilms, boolean fetchDetails) throws IOException {
         int lNbLocalFilm = 20;
 
         if (nbFilms > 20) {
@@ -172,10 +172,11 @@ public class FilmsWrapper {
             
             // STop getting details it takes to much time at this point on Heroku whic has
             //very short timeout
-            /*URL lAfficheURL = this.getDetailsOfFilm(lFilmId).getAfficheURL();
+            if(fetchDetails){
+            URL lAfficheURL = this.getDetailsOfFilm(lFilmId).getAfficheURL();
             logger.debug("Affiche URL : <" + lAfficheURL + ">");
             aFilm.setCinecityAfficheURL(lAfficheURL);
-            */
+            }
             out.add(aFilm);
 
             if (filmLoopId == nbFilms) {
@@ -186,7 +187,7 @@ public class FilmsWrapper {
     }
 
     public ArrayList<Film> getWorsts20() throws IOException {
-        return this.getTop(FilmRankingCategory.WORST, 20);
+        return this.getTop(FilmRankingCategory.WORST, 20,false);
     }
 
     public static final String cleanRawDetails(String rawDetails) {
