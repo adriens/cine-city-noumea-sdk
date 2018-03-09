@@ -209,8 +209,10 @@ public class FilmsWrapper {
         FilmDetails out = new FilmDetails();
 
         out.setFilmId(filmId);
-
+        //http://www.cinecity.nc/Cinecity/Film/39371
+        out.setFilmURL(new URL(FilmsWrapper.getFilmURL(filmId)));
         logger.info("Récuperation des details du film <" + filmId + ">");
+        logger.info("Film url : <" + out.getFilmURL() + ">");
         // le titre
         String titre = ((HtmlElement) htmlPage.getElementById("fiche_titre")).getTextContent().trim();
         logger.info("Film details pour <" + filmId + ">");
