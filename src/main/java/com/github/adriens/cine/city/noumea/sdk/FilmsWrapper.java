@@ -169,9 +169,13 @@ public class FilmsWrapper {
             logger.debug("Film id : <" + lFilmId + ">");
             //logger.info("filmId : <");
             //FilmsWrapper lWrapper = new FilmsWrapper();
-            URL lAfficheURL = this.getDetailsOfFilm(lFilmId).getAfficheURL();
+            
+            // STop getting details it takes to much time at this point on Heroku whic has
+            //very short timeout
+            /*URL lAfficheURL = this.getDetailsOfFilm(lFilmId).getAfficheURL();
             logger.debug("Affiche URL : <" + lAfficheURL + ">");
             aFilm.setCinecityAfficheURL(lAfficheURL);
+            */
             out.add(aFilm);
 
             if (filmLoopId == nbFilms) {
