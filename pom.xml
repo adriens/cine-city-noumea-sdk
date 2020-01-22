@@ -13,7 +13,7 @@
         <htmlunit.version>2.33</htmlunit.version>
         <logback.version>1.2.3</logback.version>
         <junit.version>4.13</junit.version>
-        <commons-lang.version>3.8.1</commons-lang.version>
+        <commons-lang.version>3.9</commons-lang.version>
         <jackson-databind.version>2.9.7</jackson-databind.version>
         <!-- Plugins versions -->
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
